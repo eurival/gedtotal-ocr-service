@@ -5,7 +5,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ghostscript \
-    jbig2enc \
     pngquant \
     qpdf \
     tesseract-ocr \
