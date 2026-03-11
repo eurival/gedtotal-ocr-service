@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gedtotal-ocr-service
+  namespace: gedtotalap-apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gedtotal-ocr-service
+  template:
+    metadata:
+      labels:
+        app: gedtotal-ocr-service
+    spec:
+      containers:
+        - name: gedtotal-ocr-service
+          image: docker.io/eurival/gedtotal-ocr-service
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8093
+          envFrom:
+            - configMapRef:
+                name: gedtotal-ocr-service-config
+            - secretRef:
+                name: gedtotal-ocr-service-secrets
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8093
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8093
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
