@@ -5,6 +5,7 @@ from pathlib import Path
 
 import fitz
 import ocrmypdf
+import pikepdf
 
 from app.config import Settings
 from app.models import OCRRequestMessage
@@ -61,4 +62,34 @@ class OCRService:
                 use_threads=self.settings.ocr_use_threads,
                 force_ocr=self.settings.ocr_force,
             )
+            self._reapply_base_metadata(request, input_path, output_path)
         return ocr_applied, self.output_key_for(request.caminho_arquivo)
+
+    def _reapply_base_metadata(self, request: OCRRequestMessage, input_path: Path, output_path: Path) -> None:
+        patched_output = output_path.with_name(f"{output_path.stem}-metadata{output_path.suffix}")
+        try:
+            with pikepdf.open(str(input_path)) as source_pdf, pikepdf.open(str(output_path)) as target_pdf:
+                source_docinfo = dict(source_pdf.docinfo.items())
+                for key, value in source_docinfo.items():
+                    try:
+                        target_pdf.docinfo[key] = value
+                    except Exception:
+                        self.logger.debug("Metadado ignorado key=%s arquivoId=%s", key, request.arquivo_id)
+
+                target_pdf.docinfo["/Title"] = source_docinfo.get("/Title", "Documento OCR GedTotal")
+                target_pdf.docinfo["/Author"] = source_docinfo.get("/Author", "GedTotal OCR Service")
+                target_pdf.docinfo["/Subject"] = source_docinfo.get("/Subject", "PDF OCRizado no GedTotal")
+                target_pdf.docinfo["/Keywords"] = source_docinfo.get("/Keywords", "GedTotal,OCR,PDF/A")
+                target_pdf.docinfo["/Creator"] = source_docinfo.get("/Creator", "GedTotal PdfGenerator")
+                target_pdf.docinfo["/Producer"] = "GedTotal OCR Service (OCRmyPDF)"
+                target_pdf.docinfo["/gedtotalOcrApplied"] = "true"
+                target_pdf.docinfo["/gedtotalArquivoId"] = str(request.arquivo_id)
+                if request.trace_id:
+                    target_pdf.docinfo["/gedtotalTraceId"] = request.trace_id
+
+                target_pdf.save(str(patched_output))
+
+            patched_output.replace(output_path)
+        finally:
+            if patched_output.exists():
+                patched_output.unlink(missing_ok=True)

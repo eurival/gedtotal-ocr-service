@@ -25,6 +25,7 @@ class Settings:
     kafka_output_topic: str
     kafka_failure_topic: str
     kafka_group_id: str
+    kafka_auto_offset_reset: str
     aws_access_key_id: str
     aws_secret_access_key: str
     aws_region: str
@@ -52,6 +53,7 @@ class Settings:
             kafka_output_topic=os.getenv("KAFKA_OUTPUT_TOPIC", "extrair-texto-pdf"),
             kafka_failure_topic=os.getenv("KAFKA_FAILURE_TOPIC", "arquivos-processar-gedtotal-ocr-falha"),
             kafka_group_id=os.getenv("KAFKA_GROUP_ID", "gedtotal-ocr-service"),
+            kafka_auto_offset_reset=os.getenv("KAFKA_AUTO_OFFSET_RESET", "earliest"),
             aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", ""),
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", ""),
             aws_region=os.getenv("AWS_REGION", "sa-east-1"),
