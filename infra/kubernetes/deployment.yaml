@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gedtotal-ocr-service
-  namespace: gedtotalap-apps
+  namespace: gedtotalapi-apps
 spec:
   replicas: 1
   selector:

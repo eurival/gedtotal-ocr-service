@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: gedtotal-ocr-service-config
-  namespace: gedtotalap-apps
+  namespace: gedtotalapi-apps
 data:
   SERVER_PORT: "8093"
   KAFKA_BOOTSTRAP_SERVERS: "15.229.173.87:19092"

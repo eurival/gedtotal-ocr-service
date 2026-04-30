@@ -9,4 +9,4 @@ resources:
 images:
   - name: docker.io/eurival/gedtotal-ocr-service
     newTag: 20260430.004246-6587609
-namespace: gedtotalap-apps
+namespace: gedtotalapi-apps
