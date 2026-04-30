@@ -4,7 +4,8 @@ resources:
   - deployment.yaml
   - service.yaml
   - gedtotal-ocr-service-configmap.yml
-  - secret-template.yaml
+  # secret gerenciado manualmente no cluster (kubectl create secret)
+  # - secret-template.yaml
 images:
   - name: docker.io/eurival/gedtotal-ocr-service
     newTag: 20260430.003848-364169a
