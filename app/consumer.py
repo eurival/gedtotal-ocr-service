@@ -85,6 +85,10 @@ class OCRConsumer(threading.Thread):
                     trace_id=request.trace_id,
                 )
             )
+        finally:
+            if work_dir.exists():
+                shutil.rmtree(work_dir, ignore_errors=True)
+                self.logger.debug("Diretorio temporario removido %s", work_dir)
 
 
 def ensure_kafka_available(settings: Settings) -> None:
