@@ -69,18 +69,25 @@ class OCRService:
         patched_output = output_path.with_name(f"{output_path.stem}-metadata{output_path.suffix}")
         try:
             with pikepdf.open(str(input_path)) as source_pdf, pikepdf.open(str(output_path)) as target_pdf:
-                source_docinfo = dict(source_pdf.docinfo.items())
-                for key, value in source_docinfo.items():
+                # Copiar metadados do PDF original convertendo para str para evitar ForeignObjectError
+                for key, value in source_pdf.docinfo.items():
                     try:
-                        target_pdf.docinfo[key] = value
+                        target_pdf.docinfo[key] = str(value)
                     except Exception:
                         self.logger.debug("Metadado ignorado key=%s arquivoId=%s", key, request.arquivo_id)
 
-                target_pdf.docinfo["/Title"] = source_docinfo.get("/Title", "Documento OCR GedTotal")
-                target_pdf.docinfo["/Author"] = source_docinfo.get("/Author", "GedTotal OCR Service")
-                target_pdf.docinfo["/Subject"] = source_docinfo.get("/Subject", "PDF OCRizado no GedTotal")
-                target_pdf.docinfo["/Keywords"] = source_docinfo.get("/Keywords", "GedTotal,OCR,PDF/A")
-                target_pdf.docinfo["/Creator"] = source_docinfo.get("/Creator", "GedTotal PdfGenerator")
+                # Garantir metadados mínimos (valores padrão caso não existam no original)
+                if "/Title" not in target_pdf.docinfo:
+                    target_pdf.docinfo["/Title"] = "Documento OCR GedTotal"
+                if "/Author" not in target_pdf.docinfo:
+                    target_pdf.docinfo["/Author"] = "GedTotal OCR Service"
+                if "/Subject" not in target_pdf.docinfo:
+                    target_pdf.docinfo["/Subject"] = "PDF OCRizado no GedTotal"
+                if "/Keywords" not in target_pdf.docinfo:
+                    target_pdf.docinfo["/Keywords"] = "GedTotal,OCR,PDF/A"
+                if "/Creator" not in target_pdf.docinfo:
+                    target_pdf.docinfo["/Creator"] = "GedTotal PdfGenerator"
+
                 target_pdf.docinfo["/Producer"] = "GedTotal OCR Service (OCRmyPDF)"
                 target_pdf.docinfo["/gedtotalOcrApplied"] = "true"
                 target_pdf.docinfo["/gedtotalArquivoId"] = str(request.arquivo_id)
@@ -93,3 +100,4 @@ class OCRService:
         finally:
             if patched_output.exists():
                 patched_output.unlink(missing_ok=True)
+

@@ -25,6 +25,7 @@ class OCRConsumer(threading.Thread):
                 "group.id": settings.kafka_group_id,
                 "auto.offset.reset": settings.kafka_auto_offset_reset,
                 "enable.auto.commit": False,
+                "max.poll.interval.ms": 1800000,  # 30min — PDFs grandes (600+ pg) podem demorar
             }
         )
         self.storage = S3Storage(settings)
