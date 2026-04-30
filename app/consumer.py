@@ -65,7 +65,7 @@ class OCRConsumer(threading.Thread):
         output_path = work_dir / "output.pdf"
         try:
             self.storage.download(request.caminho_arquivo, input_path)
-            ocr_applied, output_key = self.ocr_service.process(request, input_path, output_path)
+            ocr_applied, output_key, hash_sha256 = self.ocr_service.process(request, input_path, output_path)
             self.storage.upload(output_path, output_key)
             self.publisher.publish_result(
                 OCRResultMessage(
@@ -73,6 +73,7 @@ class OCRConsumer(threading.Thread):
                     caminho_arquivo=output_key,
                     ocr_applied=ocr_applied,
                     trace_id=request.trace_id,
+                    hash_sha256=hash_sha256,
                 )
             )
         except Exception as exc:
