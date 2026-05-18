@@ -7,6 +7,7 @@ from pathlib import Path
 
 import fitz
 import ocrmypdf
+from ocrmypdf.exceptions import DigitalSignatureError
 import pikepdf
 
 from app.config import Settings
@@ -29,12 +30,21 @@ class OCRService:
             doc.close()
 
     def output_key_for(self, source_key: str) -> str:
-        output_mode = (getattr(self, "_current_output_mode", None) or "").upper()
-        if self.settings.overwrite_source and output_mode != "NEW_OBJECT":
+        if self._should_overwrite_source():
             return source_key
         source_path = Path(source_key)
         suffix = getattr(self, "_current_output_suffix", None) or self.settings.output_suffix
         return str(source_path.with_name(f"{source_path.stem}{suffix}{source_path.suffix}"))
+
+    def _should_overwrite_source(self) -> bool:
+        output_mode = (getattr(self, "_current_output_mode", None) or "").upper()
+        return self.settings.overwrite_source and output_mode != "NEW_OBJECT"
+
+    def _can_invalidate_signatures(self) -> bool:
+        # LicitAI uses OCR output only as a derived text-extraction artifact.
+        # Never allow signature invalidation when overwriting the source object.
+        output_mode = (getattr(self, "_current_output_mode", None) or "").upper()
+        return output_mode == "NEW_OBJECT" and not self._should_overwrite_source()
 
     @staticmethod
     def _compute_sha256(file_path: Path) -> str:
@@ -72,20 +82,38 @@ class OCRService:
                 self.settings.ocr_jobs,
                 self.settings.ocr_output_type,
             )
-            ocrmypdf.ocr(
-                str(input_path),
-                str(output_path),
-                rotate_pages=self.settings.ocr_rotate_pages,
-                language=self.settings.ocr_language,
-                jobs=self.settings.ocr_jobs,
-                clean=self.settings.ocr_clean,
-                optimize=self.settings.ocr_optimize,
-                output_type=self.settings.ocr_output_type,
-                use_threads=self.settings.ocr_use_threads,
-                force_ocr=self.settings.ocr_force,
-            )
+            invalidate_signatures = self._can_invalidate_signatures()
+            if invalidate_signatures:
+                self.logger.warning(
+                    "OCR ira gerar copia derivada e invalidar assinaturas digitais somente no output arquivoId=%s key=%s",
+                    request.arquivo_id,
+                    request.caminho_arquivo,
+                )
+            try:
+                ocrmypdf.ocr(
+                    str(input_path),
+                    str(output_path),
+                    rotate_pages=self.settings.ocr_rotate_pages,
+                    language=self.settings.ocr_language,
+                    jobs=self.settings.ocr_jobs,
+                    clean=self.settings.ocr_clean,
+                    optimize=self.settings.ocr_optimize,
+                    output_type=self.settings.ocr_output_type,
+                    use_threads=self.settings.ocr_use_threads,
+                    force_ocr=self.settings.ocr_force,
+                    invalidate_digital_signatures=invalidate_signatures,
+                )
+            except DigitalSignatureError:
+                self.logger.warning(
+                    "PDF possui assinatura digital. OCR pulado para preservar documento original arquivoId=%s key=%s",
+                    request.arquivo_id,
+                    request.caminho_arquivo,
+                )
+                output_path.write_bytes(input_path.read_bytes())
+                ocr_applied = False
 
-        self._reapply_base_metadata(request, output_path)
+        if ocr_applied:
+            self._reapply_base_metadata(request, output_path)
         hash_sha256 = self._compute_sha256(output_path)
         self.logger.info("OCR concluido arquivoId=%s hash=%s", request.arquivo_id, hash_sha256)
         return ocr_applied, self.output_key_for(request.caminho_arquivo), hash_sha256

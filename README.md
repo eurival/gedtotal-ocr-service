@@ -87,3 +87,21 @@ O payload LicitAI mantem compatibilidade com o formato legado e adiciona metadad
 ```
 
 As credenciais S3 nao devem vir no payload. Elas continuam no ambiente/secret do servico.
+
+### PDFs assinados digitalmente no LicitAI
+
+Quando o payload define `outputMode=NEW_OBJECT`, o servico pode executar OCR em PDF assinado usando uma copia derivada. A assinatura digital do output OCR sera invalidada, mas o PDF original no S3 permanece intacto.
+
+Regra implementada:
+
+- `outputMode=NEW_OBJECT`: permite `invalidate_digital_signatures=True`, pois o resultado e artefato derivado apenas para extracao/indexacao de texto.
+- overwrite do objeto original: nao invalida assinatura; se o PDF for assinado, o OCR e pulado e o original e preservado.
+
+O LicitAI deve usar sempre:
+
+```json
+{
+  "outputMode": "NEW_OBJECT",
+  "outputSuffix": "-ocr"
+}
+```
