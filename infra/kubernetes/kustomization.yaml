@@ -13,5 +13,5 @@ resources:
   # - secret-template.yaml
 images:
   - name: docker.io/eurival/gedtotal-ocr-service
-    newTag: 20260430.013432-0e0466f
+    newTag: 20260518.184434-885adfd
 namespace: gedtotalapi-apps
