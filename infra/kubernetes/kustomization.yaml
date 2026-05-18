@@ -4,6 +4,11 @@ resources:
   - deployment.yaml
   - service.yaml
   - gedtotal-ocr-service-configmap.yml
+  - licitai-ocr-service-deployment.yaml
+  - licitai-ocr-service.yaml
+  - licitai-ocr-service-configmap.yml
+  # secret gerenciado manualmente no cluster para LicitAI
+  # - licitai-ocr-service-secret-template.yaml
   # secret gerenciado manualmente no cluster (kubectl create secret)
   # - secret-template.yaml
 images:

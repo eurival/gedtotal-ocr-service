@@ -74,7 +74,12 @@ class OCRConsumer(threading.Thread):
                     ocr_applied=ocr_applied,
                     trace_id=request.trace_id,
                     hash_sha256=hash_sha256,
-                )
+                    source_system=request.source_system,
+                    tenant=request.tenant,
+                    licitacao_id=request.licitacao_id,
+                    arquivo_licitacao_id=request.arquivo_licitacao_id,
+                ),
+                topic=request.callback_topic,
             )
         except Exception as exc:
             self.logger.exception("Falha no OCR arquivoId=%s key=%s", request.arquivo_id, request.caminho_arquivo)
@@ -85,7 +90,12 @@ class OCRConsumer(threading.Thread):
                     error_code="OCR_JOB_ERROR",
                     error_message=str(exc),
                     trace_id=request.trace_id,
-                )
+                    source_system=request.source_system,
+                    tenant=request.tenant,
+                    licitacao_id=request.licitacao_id,
+                    arquivo_licitacao_id=request.arquivo_licitacao_id,
+                ),
+                topic=request.failure_topic,
             )
         finally:
             if work_dir.exists():

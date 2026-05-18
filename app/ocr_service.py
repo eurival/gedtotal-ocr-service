@@ -29,10 +29,12 @@ class OCRService:
             doc.close()
 
     def output_key_for(self, source_key: str) -> str:
-        if self.settings.overwrite_source:
+        output_mode = (getattr(self, "_current_output_mode", None) or "").upper()
+        if self.settings.overwrite_source and output_mode != "NEW_OBJECT":
             return source_key
         source_path = Path(source_key)
-        return str(source_path.with_name(f"{source_path.stem}{self.settings.output_suffix}{source_path.suffix}"))
+        suffix = getattr(self, "_current_output_suffix", None) or self.settings.output_suffix
+        return str(source_path.with_name(f"{source_path.stem}{suffix}{source_path.suffix}"))
 
     @staticmethod
     def _compute_sha256(file_path: Path) -> str:
@@ -51,6 +53,8 @@ class OCRService:
 
     def process(self, request: OCRRequestMessage, input_path: Path, output_path: Path) -> tuple[bool, str, str]:
         """Retorna (ocr_applied, output_key, hash_sha256)."""
+        self._current_output_mode = request.output_mode
+        self._current_output_suffix = request.output_suffix
         ocr_applied = True
         if not self.settings.ocr_force and self.has_text(input_path):
             self.logger.info(
@@ -166,4 +170,3 @@ class OCRService:
         finally:
             if patched_output.exists():
                 patched_output.unlink(missing_ok=True)
-

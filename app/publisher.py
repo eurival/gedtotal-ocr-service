@@ -14,14 +14,16 @@ class OCRPublisher:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.producer = Producer({"bootstrap.servers": settings.kafka_bootstrap_servers})
 
-    def publish_result(self, message: OCRResultMessage) -> None:
+    def publish_result(self, message: OCRResultMessage, topic: str | None = None) -> None:
         payload = message.to_json()
-        self.logger.info("Publicando resultado OCR arquivoId=%s topico=%s", message.arquivo_id, self.settings.kafka_output_topic)
-        self.producer.produce(self.settings.kafka_output_topic, key=str(message.arquivo_id), value=payload)
+        target_topic = topic or self.settings.kafka_output_topic
+        self.logger.info("Publicando resultado OCR arquivoId=%s topico=%s", message.arquivo_id, target_topic)
+        self.producer.produce(target_topic, key=str(message.arquivo_id), value=payload)
         self.producer.flush()
 
-    def publish_failure(self, message: OCRFailureMessage) -> None:
+    def publish_failure(self, message: OCRFailureMessage, topic: str | None = None) -> None:
         payload = message.to_json()
-        self.logger.error("Publicando falha OCR arquivoId=%s topico=%s code=%s", message.arquivo_id, self.settings.kafka_failure_topic, message.error_code)
-        self.producer.produce(self.settings.kafka_failure_topic, key=str(message.arquivo_id), value=payload)
+        target_topic = topic or self.settings.kafka_failure_topic
+        self.logger.error("Publicando falha OCR arquivoId=%s topico=%s code=%s", message.arquivo_id, target_topic, message.error_code)
+        self.producer.produce(target_topic, key=str(message.arquivo_id), value=payload)
         self.producer.flush()

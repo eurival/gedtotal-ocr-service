@@ -47,3 +47,43 @@ python -m app.main
 ## Comportamento atual
 Por compatibilidade com o script legado, o servico sobrescreve o mesmo objeto no S3 por padrao.
 Defina `OCR_OVERWRITE_SOURCE=false` para gerar uma variante com sufixo.
+
+## Modo LicitAI
+
+Para reutilizar este worker no LicitAI sem misturar os fluxos do GedTotal, suba uma instancia separada com topicos e bucket proprios:
+
+```bash
+APP_NAME=licitai-ocr-service
+KAFKA_BOOTSTRAP_SERVERS=15.229.173.87:19092
+KAFKA_INPUT_TOPIC=licitai.ocr.requests
+KAFKA_OUTPUT_TOPIC=licitai.ocr.results
+KAFKA_FAILURE_TOPIC=licitai.ocr.failures
+KAFKA_GROUP_ID=licitai-ocr-service
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=sa-east-1
+S3_BUCKET=licitai-ai-processing
+OCR_OVERWRITE_SOURCE=false
+OCR_OUTPUT_SUFFIX=-ocr
+```
+
+O payload LicitAI mantem compatibilidade com o formato legado e adiciona metadados opcionais:
+
+```json
+{
+  "id": 3329460,
+  "caminhoarquivo": "licitai/ocr/licitacoes/152978/arquivos/3329460/original.pdf",
+  "traceId": "licitai-ocr-152978-3329460-ab12cd34",
+  "sourceSystem": "LICITAI",
+  "tenant": "licitai",
+  "licitacaoId": 152978,
+  "arquivoLicitacaoId": 3329460,
+  "nomeArquivo": "EDITAL.pdf",
+  "callbackTopic": "licitai.ocr.results",
+  "failureTopic": "licitai.ocr.failures",
+  "outputMode": "NEW_OBJECT",
+  "outputSuffix": "-ocr"
+}
+```
+
+As credenciais S3 nao devem vir no payload. Elas continuam no ambiente/secret do servico.

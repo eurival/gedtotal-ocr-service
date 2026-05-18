@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: licitai-ocr-service
+  namespace: gedtotalapi-apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: licitai-ocr-service
+  template:
+    metadata:
+      labels:
+        app: licitai-ocr-service
+    spec:
+      containers:
+        - name: licitai-ocr-service
+          image: docker.io/eurival/gedtotal-ocr-service
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8093
+          envFrom:
+            - configMapRef:
+                name: licitai-ocr-service-config
+            - secretRef:
+                name: licitai-ocr-service-secrets
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8093
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8093
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "4000m"
+              memory: "4Gi"
