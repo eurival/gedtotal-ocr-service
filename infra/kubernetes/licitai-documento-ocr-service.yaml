@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: licitai-documento-ocr-service
+  namespace: gedtotalapi-apps
+  labels:
+    app: licitai-documento-ocr-service
+spec:
+  selector:
+    app: licitai-documento-ocr-service
+  ports:
+    - name: http
+      port: 8093
+      targetPort: 8093
+  type: ClusterIP

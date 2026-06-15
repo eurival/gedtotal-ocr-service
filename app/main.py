@@ -1,3 +1,17 @@
+# -*- coding: utf-8 -*-
+#
+# Classe:
+#    Main
+# Descrição:
+#    Classe de configuração
+# Autor:
+#    Euríval
+# Data:
+#    2026-01-13
+# Arquivo:
+#    main.py
+# Função:
+#    Classe de configuração
 from __future__ import annotations
 
 import logging

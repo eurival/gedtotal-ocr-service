@@ -1,4 +1,23 @@
-from __future__ import annotations
+# -*- coding: utf-8 -*-
+#
+# Classe:
+#    OCRRequestMessage, OCRResultMessage, OCRFailureMessage
+# Descrição:
+#    Classe de configuração
+# Autor:
+#    Euríval
+# Data:
+#    2026-01-13
+# Arquivo:
+#    models.py
+# Função:
+#    Classe de configuração
+# Importações:
+#    from __future__ import annotations
+#    import json
+#    from dataclasses import dataclass
+#    from typing import Any
+
 
 import json
 from dataclasses import dataclass

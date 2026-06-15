@@ -1,7 +1,23 @@
-from __future__ import annotations
+# -*- coding: utf-8 -*-
+#
+# Classe:
+#    OCRPublisher
+# Descrição:
+#    Classe de configuração
+# Autor:
+#    Euríval
+# Data:
+#    2026-01-13
+# Arquivo:
+#    publisher.py
+# Função:
+#    Classe de configuração
+# Importações:
+#    from __future__ import annotations
+#    import logging
+#    from confluent_kafka import Producer
 
 import logging
-
 from confluent_kafka import Producer
 
 from app.config import Settings

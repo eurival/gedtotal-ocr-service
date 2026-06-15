@@ -105,3 +105,6 @@ O LicitAI deve usar sempre:
   "outputSuffix": "-ocr"
 }
 ```
+
+## Arquitetura Multi-Deployment e S3 Configurável
+Para mais detalhes sobre as novas variáveis de ambiente suportadas, restrição por prefixo, matriz de deployments (gedtotal, licitai-ocr, licitai-documento-ocr) e exemplos de S3 compatíveis (EVEO/MinIO), consulte o documento detalhado de [Arquitetura](docs/architecture.md).

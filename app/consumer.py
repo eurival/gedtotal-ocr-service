@@ -1,5 +1,21 @@
-from __future__ import annotations
-
+# -*- coding: utf-8 -*-
+#
+# Classe:
+#    OCRConsumer
+# Descrição:
+#    Classe de configuração
+# Autor:
+#    Euríval
+# Data:
+#    2026-01-13
+# Arquivo:
+#    consumer.py
+# Função:
+#    Classe de configuração
+# Importações:
+#    from __future__ import annotations
+#    import logging
+#    import shutil
 import logging
 import shutil
 import threading

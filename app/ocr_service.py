@@ -1,4 +1,23 @@
-from __future__ import annotations
+# -*- coding: utf-8 -*-
+#
+# Classe:
+#    OCRService
+# Descrição:
+#    Classe de configuração
+# Autor:
+#    Euríval
+# Data:
+#    2026-01-13
+# Arquivo:
+#    ocr_service.py
+# Função:
+#    Classe de configuração
+# Importações:
+#    from __future__ import annotations
+#    import hashlib
+#    import logging
+#    from datetime import datetime, timezone
+#    from pathlib import Path
 
 import hashlib
 import logging

@@ -1,6 +1,23 @@
-from __future__ import annotations
+# -*- coding: utf-8 -*-
+#
+# Classe:
+#    Settings
+# Descrição:
+#    Classe de configuração
+# Autor:
+#    Euríval
+# Data:
+#    2026-01-13
+# Arquivo:
+#    config.py
+# Função:
+#    Classe de configuração
+# Importações:
+#    from __future__ import annotations
+#    import os
+#    from dataclasses import dataclass
 
-import os
+
 from dataclasses import dataclass
 
 
@@ -42,9 +59,44 @@ class Settings:
     overwrite_source: bool
     output_suffix: str
     log_level: str
+    storage_provider: str
+    s3_endpoint: str
+    s3_region: str
+    s3_path_style: bool
+    s3_verify_ssl: bool
+    s3_allowed_prefix: str
+    aws_session_token: str
 
     @classmethod
     def from_env(cls) -> "Settings":
+        import os
+        required_vars = [
+            "KAFKA_BOOTSTRAP_SERVERS",
+            "KAFKA_INPUT_TOPIC",
+            "KAFKA_OUTPUT_TOPIC",
+            "KAFKA_FAILURE_TOPIC",
+            "KAFKA_GROUP_ID",
+            "S3_BUCKET",
+        ]
+        missing = [var for var in required_vars if not os.getenv(var)]
+        if missing:
+            raise ValueError(f"Variaveis de ambiente obrigatorias ausentes no startup: {', '.join(missing)}")
+
+        # Validacao de credenciais em par e session token dependente
+        access_key = os.getenv("AWS_ACCESS_KEY_ID")
+        secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+        session_token = os.getenv("AWS_SESSION_TOKEN")
+
+        if (access_key and not secret_key) or (secret_key and not access_key):
+            raise ValueError("As credenciais AWS_ACCESS_KEY_ID e AWS_SECRET_ACCESS_KEY devem ser fornecidas em par (ambas preenchidas ou ambas ausentes).")
+
+        if session_token and (not access_key or not secret_key):
+            raise ValueError("A variavel AWS_SESSION_TOKEN nao pode ser fornecida sem o par AWS_ACCESS_KEY_ID e AWS_SECRET_ACCESS_KEY.")
+
+        provider = os.getenv("STORAGE_PROVIDER", "s3")
+        if provider.lower() != "s3":
+            raise ValueError(f"STORAGE_PROVIDER '{provider}' nao e suportado. Atualmente apenas 's3' e implementado.")
+
         return cls(
             app_name=os.getenv("APP_NAME", "gedtotal-ocr-service"),
             server_port=_as_int(os.getenv("SERVER_PORT"), 8093),
@@ -70,4 +122,11 @@ class Settings:
             overwrite_source=_as_bool(os.getenv("OCR_OVERWRITE_SOURCE"), True),
             output_suffix=os.getenv("OCR_OUTPUT_SUFFIX", "-ocr"),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
+            storage_provider=os.getenv("STORAGE_PROVIDER", "s3"),
+            s3_endpoint=os.getenv("S3_ENDPOINT", ""),
+            s3_region=os.getenv("S3_REGION") or os.getenv("AWS_REGION", "sa-east-1"),
+            s3_path_style=_as_bool(os.getenv("S3_PATH_STYLE"), False),
+            s3_verify_ssl=_as_bool(os.getenv("S3_VERIFY_SSL"), True),
+            s3_allowed_prefix=os.getenv("S3_ALLOWED_PREFIX", ""),
+            aws_session_token=os.getenv("AWS_SESSION_TOKEN", ""),
         )

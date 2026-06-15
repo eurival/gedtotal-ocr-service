@@ -7,8 +7,12 @@ resources:
   - licitai-ocr-service-deployment.yaml
   - licitai-ocr-service.yaml
   - licitai-ocr-service-configmap.yml
+  - licitai-documento-ocr-service-deployment.yaml
+  - licitai-documento-ocr-service.yaml
+  - licitai-documento-ocr-service-configmap.yml
   # secret gerenciado manualmente no cluster para LicitAI
   # - licitai-ocr-service-secret-template.yaml
+  # - licitai-documento-ocr-service-secret-template.yaml
   # secret gerenciado manualmente no cluster (kubectl create secret)
   # - secret-template.yaml
 images:

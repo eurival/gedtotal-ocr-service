@@ -1,3 +1,23 @@
+# -*- coding: utf-8 -*-
+#
+# Classe:
+#    Dockerfile
+# Descrição:
+#    Classe de configuração
+# Autor:
+#    Euríval
+# Data:
+#    2026-01-13
+# Arquivo:
+#    Dockerfile
+# Função:
+#    Classe de configuração
+# Importações:
+#    from __future__ import annotations
+#    import os
+#    from dataclasses import dataclass
+
+
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -26,12 +46,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && make install \
     && rm -rf /tmp/jbig2enc \
     && apt-get purge -y --auto-remove \
-        autoconf \
-        automake \
-        build-essential \
-        git \
-        libtool \
-        pkg-config \
+    autoconf \
+    automake \
+    build-essential \
+    git \
+    libtool \
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

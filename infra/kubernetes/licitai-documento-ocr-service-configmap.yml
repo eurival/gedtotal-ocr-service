@@ -1,23 +1,24 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: licitai-ocr-service-config
+  name: licitai-documento-ocr-service-config
   namespace: gedtotalapi-apps
 data:
-  APP_NAME: "licitai-ocr-service"
+  APP_NAME: "licitai-documento-ocr-service"
   SERVER_PORT: "8093"
   KAFKA_BOOTSTRAP_SERVERS: "15.229.173.87:19092"
-  KAFKA_INPUT_TOPIC: "licitai.ocr.requests"
-  KAFKA_OUTPUT_TOPIC: "licitai.ocr.results"
-  KAFKA_FAILURE_TOPIC: "licitai.ocr.failures"
-  KAFKA_GROUP_ID: "licitai-ocr-service"
+  KAFKA_INPUT_TOPIC: "licitai.documento.ocr.solicitado"
+  KAFKA_OUTPUT_TOPIC: "licitai.documento.ocr.processado"
+  KAFKA_FAILURE_TOPIC: "licitai.documento.ocr.falhou"
+  KAFKA_GROUP_ID: "licitai-documento-ocr-service"
+  KAFKA_AUTO_OFFSET_RESET: "earliest"
   STORAGE_PROVIDER: "s3"
   S3_ENDPOINT: "https://object.sp2.eveo.com.br"
   S3_BUCKET: "licitaglobal"
   S3_REGION: "auto"
   S3_PATH_STYLE: "true"
   S3_VERIFY_SSL: "true"
-  S3_ALLOWED_PREFIX: "licitai/ocr/licitacoes/"
+  S3_ALLOWED_PREFIX: "documentos/"
   OCR_LANGUAGE: "por"
   OCR_JOBS: "8"
   OCR_OUTPUT_TYPE: "pdfa"
